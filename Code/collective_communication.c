@@ -1,16 +1,12 @@
-#include <stdio.h>
-#include "mpi.h"
-#include <stdlib.h>
-
 struct maxloc
 {
     float value;
     int processor;
 };
 
-void Check_MPI_Routines (int return_value, char *mpi_routine);                                           // Δήλωση του πρωτότυπου της συνάρτησης "Check_MPI_Routines ()" που ο κώδικας της βρίσκεται στις γραμμές 192-199
+void Check_MPI_Routines (int return_value, char *mpi_routine);                                           // Declaration of the prototype for the "Check_MPI_Routines ()" function, whose code is located in lines 192-199
 void Check_Memory_Int (int *vec);
-void Check_Memory_Float (float *vec); // Δήλωση του πρωτότυπου της συνάρτησης "Check_Memory ()" που ο κώδικας της βρίσκεται στις γραμμές 201-208
+void Check_Memory_Float (float *vec); // Declaration of the prototype for the "Check_Memory ()" function, whose code is located in lines 201-208
 void Check_Memory_Struct (struct maxloc *vec);
 float Count_Avg (int *vec, int N);
 
@@ -27,41 +23,43 @@ int main (int argc, char *argv[])
     int global_greater_than_m, global_less_than_m;
     int i;
     struct maxloc send, recv;
-    /******************************************************************************************* Έναρξη του MPI περιβάλλοντος **************************************************************************************/   
-    Check_MPI_Routines (MPI_Init (&argc, &argv), "MPI_Init ()");                                         // Έναρξη της χρήσης των MPI ρουτίνων και έλεγχος με την "Check_MPI_Routines ()" για τυχόν δυσλειτουργία
-    Check_MPI_Routines (MPI_Comm_rank (MPI_COMM_WORLD, &rank), "MPI_Comm_rank ()");                       // Εκχώρηση στην rank το αναγνωριστικό της κάθε διεργασίας και έλεγχος με την "Check_MPI_Routines ()" για τυχόν δυσλειτουργία
-    Check_MPI_Routines (MPI_Comm_size (MPI_COMM_WORLD, &p), "MPI_Comm_size ()");                          // Εκχώρηση στην p το πλήθος των διεργασιών και έλεγχος με την "Check_MPI_Routines ()" για τυχόν δυσλειτουργία
- /******************************************************************************************* Ατέρμονος βρόχος **************************************************************************************************/
+
+    /******************************************************************************************* Start of MPI environment **************************************************************************************/   
+    Check_MPI_Routines (MPI_Init (&argc, &argv), "MPI_Init ()");                                         // Start of using MPI routines and check with "Check_MPI_Routines ()" for any malfunction
+    Check_MPI_Routines (MPI_Comm_rank (MPI_COMM_WORLD, &rank), "MPI_Comm_rank ()");                       // Assign the rank the identifier of each process and check with "Check_MPI_Routines ()" for any malfunction
+    Check_MPI_Routines (MPI_Comm_size (MPI_COMM_WORLD, &p), "MPI_Comm_size ()");                          // Assign to p the number of processes and check with "Check_MPI_Routines ()" for any malfunction
+
+    /******************************************************************************************* Infinite Loop **************************************************************************************************/
     //while (1)                                                                                           
     //{
 /*-------------------------------------------------------------------------------------------------- P0 --------------------------------------------------------------------------------------------------------*/
         root = 0;
-        if (rank == root)                                                                                   /* Κώδικας που θα εκτελέσει μόνο η διεργασία P0 */
+        if (rank == root)                                                                                   /* Code that will be executed only by process P0 */
         {
-            do                                                                                           /* Β΄ροχος για την εξασφάλιση ότι το μέγεθος της ακολουθίας θα είναι ακέραιο πολλαπλάσιο με το πλήθος των διεργασιών */
+            do                                                                                           /* Loop to ensure that the size of the sequence will be an integer multiple of the number of processes */
             {
-                system ("clear");                                                                        // Καθαρισμός της οθόνης 
-                printf ("Number of processors are %d\n", p);                                             // Εκτύπωση του πλήθους των διεργασιών 
-                printf ("Size of integers' sequence must be integer multiple of number of processors (N mod processors == 0).\n"); // Εκτύπωση της συνθήκης του βρόχου σε φυσική γλώσσα
-                printf ("Input the size of integers' sequence : ");                                      // Εκτύπωση για εισαγωγή του μεγέθους της ακολουθίας
-                scanf ("%d", &N);                                                                        // Εισαγωγή του μεγέθους της ακολουθίας 
+                system ("clear");                                                                        // Clear the screen 
+                printf ("Number of processors are %d\n", p);                                             // Print the number of processes 
+                printf ("Size of integers' sequence must be integer multiple of number of processors (N mod processors == 0).\n"); // Print the loop condition in natural language
+                printf ("Input the size of integers' sequence : ");                                      // Print for inputting the size of the sequence
+                scanf ("%d", &N);                                                                        // Input the size of the sequence 
             }
-            while (N % p != 0);                                                                          /* Η συνθήκη */
+            while (N % p != 0);                                                                          /* The condition */
             
-            X = (int *) malloc (N * sizeof (int));                                                     // Δυναμική δέσμευση μνήμης για την αποθήκευση της ακολουθίας
-            Check_Memory_Int (X);                                                                          // Έλεγχος με την "Check_Memory ()" για τυχόν δυσλειτουργία
-            printf ("Input elements of vector X\n");                                                   // Εκτύπωση για εισαγωγή στοιχείων στην ακολουθία
-            for (i = 0; i < N; i++)                                                                      /* Βρόχος για την προσπέλαση της ακολουθίας */
+            X = (int *) malloc (N * sizeof (int));                                                     // Dynamic memory allocation for storing the sequence
+            Check_Memory_Int (X);                                                                          // Check with "Check_Memory ()" for any malfunction
+            printf ("Input elements of vector X\n");                                                   // Print for inputting elements into the sequence
+            for (i = 0; i < N; i++)                                                                      /* Loop for accessing the sequence */
             {
-                printf ("X[%d] : ", i);                                                                // Εκτύπωση των θέσεων της ακολουθίας
-                scanf ("%d", &X[i]);                                                                   // Εισαγωγή στοιχείων στην ακολουθίας
+                printf ("X[%d] : ", i);                                                                // Print the positions of the sequence
+                scanf ("%d", &X[i]);                                                                   // Input elements into the sequence
             }
             m = Count_Avg (X, N);
         }
         Check_MPI_Routines (MPI_Bcast (&N, 1, MPI_INT, root, MPI_COMM_WORLD), "MPI_Bcast ()");
         Check_MPI_Routines (MPI_Bcast (&m, 1, MPI_FLOAT, root, MPI_COMM_WORLD), "MPI_Bcast ()");
         elements_per_p = N / p;
-        local_X = (int *) malloc (elements_per_p * sizeof (int));                                                     // Δυναμική δέσμευση μνήμης για την αποθήκευση της ακολουθίας
+        local_X = (int *) malloc (elements_per_p * sizeof (int));                                                     // Dynamic memory allocation for storing the sequence
         Check_Memory_Int (local_X);
         Check_MPI_Routines (MPI_Scatter (X, elements_per_p, MPI_INT, local_X, elements_per_p, MPI_INT, root, MPI_COMM_WORLD), "MPI_Scatter ()");
         //for (i = 0; i < elements_per_p; i++)
@@ -129,67 +127,66 @@ int main (int argc, char *argv[])
             }
         }
         root = 0;
-        Check_MPI_Routines (MPI_Reduce (&send, &recv, 1, MPI_FLOAT_INT, MPI_MAXLOC, root, MPI_COMM_WORLD), "MPI_Reduce ()");
-        if (rank == root)
-        {
-          //  for (i = 0; i < N; i++)
-            //    if (X[i] == recv[0].value)
+Check_MPI_Routines (MPI_Reduce (&send, &recv, 1, MPI_FLOAT_INT, MPI_MAXLOC, root, MPI_COMM_WORLD), "MPI_Reduce ()");
+if (rank == root)
+{
+  //  for (i = 0; i < N; i++)
+    //    if (X[i] == recv[0].value)
              //       index = i;
-            printf ("---------------------------------------\n");
-            printf ("Question D\n");
-            printf ("Element's index of vector X with the highest D[i] : %d\n", recv.processor);
-            printf ("Vector X's element with the highest D[i]          : %d\n", X[recv.processor]);
-            printf ("Max D[i]                                          : %f\n", recv.value);
-        }
-        free (X);
-        free (D);
-        free (local_X);
-        free (local_D);
+    printf ("---------------------------------------\n");
+    printf ("Question D\n");
+    printf ("Element's index of vector X with the highest D[i] : %d\n", recv.processor);
+    printf ("Vector X's element with the highest D[i]          : %d\n", X[recv.processor]);
+    printf ("Max D[i]                                          : %f\n", recv.value);
+}
+free (X);
+free (D);
+free (local_X);
+free (local_D);
        
-        
-    return 0;
+return 0;
 }
 
-/****************************************************************************************** Κώδικας Check_MPI_Routines ******************************************************************************************/ 
-void Check_MPI_Routines (int return_value, char *mpi_routine)                                            /* Η συνάρτηση ελέγχου των τιμών επιστροφής των MPI ρουτίνων για τυχόν σφάλματα */
+/****************************************************************************************** Code for Check_MPI_Routines ******************************************************************************************/ 
+void Check_MPI_Routines (int return_value, char *mpi_routine)                                            /* The function checks the return values of MPI routines for any errors */
 {
-    if (return_value != MPI_SUCCESS)                                                                     /* Η τιμή επιστροφής της MPI ρουτίνας είναι σφάλματος */
+    if (return_value != MPI_SUCCESS)                                                                     /* The return value of the MPI routine indicates an error */
     {
-        printf ("Error in executing MPI routine \"%s\"\n", mpi_routine);                                 // Εκτύπωση μηνύματος σφάλματος κατά την εκτέλεση μίας MPI ρουτίνας
-        MPI_Abort (MPI_COMM_WORLD, return_value);                                                        // Εγκατάλειψη της χρήσης των MPI ρουτίνων
+        printf ("Error in executing MPI routine \"%s\"\n", mpi_routine);                                 // Print an error message during the execution of an MPI routine
+        MPI_Abort (MPI_COMM_WORLD, return_value);                                                        // Abort the use of MPI routines
     }
 }
-/****************************************************************************************** Κώδικας Check_Memory *************************************************************************************************/ 
-void Check_Memory_Int (int *vec)                                                                             /* Η συνάρτηση ελέγχου της δυναμικής δέσμευσης πινάκων για τυχόν σφάλματα */
+
+/****************************************************************************************** Code for Check_Memory *************************************************************************************************/ 
+void Check_Memory_Int (int *vec)                                                                             /* The function checks dynamic memory allocation for arrays for any errors */
 {
-    if (!vec)                                                                                            /* Αδυναμία δέσμευσης μνήμης */
+    if (!vec)                                                                                            /* Memory allocation failure */
     {
-        printf ("Error in allocating heap memory\n");                                                    // Εκτύπωση μηνύματος σφάλματος κατά την δυναμική δέσμευση
+        printf ("Error in allocating heap memory\n");                                                    // Print an error message during dynamic allocation
         Check_MPI_Routines (MPI_Finalize (), "MPI_Finalize ()"); 
-        exit (1);                                                                                        // Τερματισμός του προγράμματος με τιμή επιστροφής 1
+        exit (1);                                                                                        // Terminate the program with return value 1
     }
 }
 
-void Check_Memory_Float (float *vec)                                                                             /* Η συνάρτηση ελέγχου της δυναμικής δέσμευσης πινάκων για τυχόν σφάλματα */
+void Check_Memory_Float (float *vec)                                                                             /* The function checks dynamic memory allocation for arrays for any errors */
 {
-    if (!vec)                                                                                            /* Αδυναμία δέσμευσης μνήμης */
+    if (!vec)                                                                                            /* Memory allocation failure */
     {
-        printf ("Error in allocating heap memory\n");                                                    // Εκτύπωση μηνύματος σφάλματος κατά την δυναμική δέσμευση
+        printf ("Error in allocating heap memory\n");                                                    // Print an error message during dynamic allocation
         Check_MPI_Routines (MPI_Finalize (), "MPI_Finalize ()"); 
-        exit (1);                                                                                        // Τερματισμός του προγράμματος με τιμή επιστροφής 1
+        exit (1);                                                                                        // Terminate the program with return value 1
     }
 }
 
-void Check_Memory_Struct (struct maxloc *vec)                                                                             /* Η συνάρτηση ελέγχου της δυναμικής δέσμευσης πινάκων για τυχόν σφάλματα */
+void Check_Memory_Struct (struct maxloc *vec)                                                                             /* The function checks dynamic memory allocation for arrays for any errors */
 {
-    if (!vec)                                                                                            /* Αδυναμία δέσμευσης μνήμης */
+    if (!vec)                                                                                            /* Memory allocation failure */
     {
-        printf ("Error in allocating heap memory\n");                                                    // Εκτύπωση μηνύματος σφάλματος κατά την δυναμική δέσμευση
+        printf ("Error in allocating heap memory\n");                                                    // Print an error message during dynamic allocation
         Check_MPI_Routines (MPI_Finalize (), "MPI_Finalize ()"); 
-        exit (1);                                                                                        // Τερματισμός του προγράμματος με τιμή επιστροφής 1
+        exit (1);                                                                                        // Terminate the program with return value 1
     }
 }
-
 
 float Count_Avg (int *vec, int N)
 {
