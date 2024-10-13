@@ -27,7 +27,7 @@ The program fulfills the following tasks:
 
 ## Course Information
 
-- **Course**: [Introduction to Parallel Computing](https://ice.uniwa.gr/education/undergraduate/courses/parallel-programming-mpi/)
+- **Course**: [Introduction to Parallel Computing](https://ice.uniwa.gr/education/undergraduate/courses/introduction-to-parallel-computing/)
 - **Semester**: 5
 - **Program of Study**: [UNIWA](https://www.uniwa.gr/)
 - **Department**: [Informatics and Computer Engineering](https://ice.uniwa.gr/)
@@ -110,7 +110,7 @@ mpirun -np <number_of_processors> ./collective_communication
 
 ## Πληροφορίες Μαθήματος
 
-- **Μάθημα**: [Εισαγωγή στον Παράλληλο Υπολογισμό](https://ice.uniwa.gr/education/undergraduate/courses/parallel-programming-mpi/)
+- **Μάθημα**: [Εισαγωγή στον Παράλληλο Υπολογισμό](https://ice.uniwa.gr/education/undergraduate/courses/introduction-to-parallel-computing/)
 - **Εξάμηνο**: 5
 - **Πρόγραμμα Σπουδών**: [ΠΑΔA](https://www.uniwa.gr/)
 - **Τμήμα**: [Πληροφορική και Μηχανική Υπολογιστών](https://ice.uniwa.gr/)
