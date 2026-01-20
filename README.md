@@ -218,15 +218,7 @@ Important:
 The vector size N must satisfy:
 
 $$
-𝑁
- 
-m
-o
-d
- 
-𝑝
-=
-0
+N mod p = 0
 $$
 
 (i.e., N must be an integer multiple of the number of processes)
@@ -241,9 +233,7 @@ The current implementation does not support uneven vector sizes across processes
 Handling cases where 
 
 $$
-𝑁
-<
-𝑝
+N < p
 $$
 
 is not supported, as some processes would remain idle.
