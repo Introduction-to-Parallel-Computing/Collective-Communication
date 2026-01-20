@@ -1,165 +1,266 @@
-![Alt text](https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Flag_of_the_United_Kingdom_%281-2%29.svg/255px-Flag_of_the_United_Kingdom_%281-2%29.svg.png)
+<p align="center">
+  <img src="https://www.especial.gr/wp-content/uploads/2019/03/panepisthmio-dut-attikhs.png" alt="UNIWA" width="150"/>
+</p>
 
-# MPI Program for Vector Analysis with Collective Communication
+<p align="center">
+  <strong>UNIVERSITY OF WEST ATTICA</strong><br>
+  SCHOOL OF ENGINEERING<br>
+  DEPARTMENT OF COMPUTER ENGINEERING AND INFORMATICS
+</p>
 
-For the requested Assignment, click the link:
-[Assignment](Assignment/)
+<hr/>
 
-For the Source Code, click the link:
-[Code](Code/)
+<p align="center">
+  <strong>Introduction to Parallel Computing</strong>
+</p>
 
-For the detailed Documentation, click the link:
-[Documentation](Documentation/)
+<h1 align="center" style="letter-spacing: 1px;">
+  Collective Communication
+</h1>
 
-## Overview
+<p align="center">
+  <strong>Vasileios Evangelos Athanasiou</strong><br>
+  Student ID: 19390005
+</p>
 
-This project implements an MPI (Message Passing Interface) program in C to analyze a vector \(X\) (of length \(n\)). The program computes various statistics about the vector in a parallel environment with \(p\) processors, including the mean, minimum, and maximum values, and derives additional properties such as dispersion, percentage relationships, and prefix sums.
+<p align="center">
+  <a href="https://github.com/Ath21" target="_blank">GitHub</a> ·
+  <a href="https://www.linkedin.com/in/vasilis-athanasiou-7036b53a4/" target="_blank">LinkedIn</a>
+</p>
 
-## Objectives
+<hr/>
 
-The program fulfills the following tasks:
+<p align="center">
+  <strong>Supervision</strong>
+</p>
 
-1. **Count Elements Relative to Mean**: Determine how many elements of the vector \(X\) are less than and greater than the mean \(m\).
-2. **Calculate Dispersion**: Compute the variance of the elements of vector \(X\).
-3. **Percentage Vector**: Create a new vector \(D\) where each element \(y_i\) represents the percentage relationship of the corresponding element \(x_i\) of vector \(X\) relative to the difference between the maximum and minimum values.
-4. **Max Value in Vector \(D\)**: Identify the largest value in vector \(D\), along with its corresponding element \(x_i\) in vector \(X\) and the index of the element.
-5. **Prefix Sums**: Calculate the prefix sums of the elements of vector \(X\).
+<p align="center">
+  Supervisor: Vasileios Mamalis, Professor
+</p>
+<p align="center">
+  <a href="https://ice.uniwa.gr/en/emd_person/vassilios-mamalis/" target="_blank">UNIWA Profile</a>
+</p>
 
-## Course Information
+<p align="center">
+  Supervisor: Grammati Pantziou, Professor
+</p>
+<p align="center">
+  <a href="https://ice.uniwa.gr/en/emd_person/grammati-pantziou/" target="_blank">UNIWA Profile</a> ·
+  <a href="https://www.linkedin.com/in/grammati-pantziou-4731bb10a/" target="_blank">LinkedIn</a>
+</p>
 
-- **Course**: [Introduction to Parallel Computing](https://ice.uniwa.gr/education/undergraduate/courses/introduction-to-parallel-computing/)
-- **Semester**: 5
-- **Program of Study**: [UNIWA](https://www.uniwa.gr/)
-- **Department**: [Informatics and Computer Engineering](https://ice.uniwa.gr/)
-- **Lab Instructor**: [Iordanakis Michael](https://ice.uniwa.gr/academic_sc_ho/)
-- **Academic Season**: 2022-2023
+<p align="center">
+  Co-supervisor: Michalis Iordanakis, Special Technical Laboratory Staff
+</p>
 
-## Student Information
+<p align="center">
+  <a href="https://scholar.google.com/citations?user=LiVuwVEAAAAJ&hl=en" target="_blank">UNIWA Profile</a>
+</p>
 
-- **Name**: Athanasiou Vasileios Evangelos
-- **Student ID**: 19390005
-- **Status**: Undergraduate
+<hr/>
 
-## Program Structure
+<p align="center">
+  Athens, January 2023
+</p>
 
-### Main MPI Program
+---
 
-- **File**: `collective_communication.c`
-- **Functionality**: 
-  - Reads the vector size \(N\) and its elements from the user.
-  - Distributes the workload among \(p\) processors for parallel computations.
-  - Collects results from all processors and prints the analysis, including the prefix sum.
+# Project Overview
 
-### Menu and Iteration
+The primary objective of this exercise is to manage and process a vector **X** of size **N** across **p processes** using MPI and collective communication.
 
-- The program provides a user-friendly menu with options to:
-  1. Continue analyzing another vector.
-  2. Exit the program.
-- The menu is displayed iteratively until the user chooses to exit.
 
-## Requirements
+---
 
-- **Operating System**: Linux-based OS or any Unix-like system that supports MPI.
-- **Compiler**: GCC (GNU Compiler Collection).
-- **Libraries**: MPI library (`mpi.h`).
+## Table of Contents
 
-## Installation and Usage
+| Section | Folder | Description |
+|------:|--------|-------------|
+| 1 | `assign/` | Assignment material for the Collective Communication laboratory |
+| 1.1 | `assign/PAR-LAB-EXER-II-2022-23.pdf` | Laboratory exercise description in English |
+| 1.2 | `assign/ΠΑΡ-ΕΡΓ-ΑΣΚ-ΙΙ-2022-23.pdf` | Περιγραφή εργαστηριακής άσκησης (Greek) |
+| 2 | `docs/` | Documentation and theoretical background on collective communication |
+| 2.1 | `docs/Collective-Communication.pdf` | Theory and mechanisms of collective communication (EN) |
+| 2.2 | `docs/Συλλογική-Επικοινωνία.pdf` | Θεωρία Συλλογικής Επικοινωνίας (EL) |
+| 3 | `src/` | Source code implementing collective communication operations |
+| 3.1 | `src/collective_communication.c` | C implementation of MPI collective communication primitives |
+| 4 | `README.md` | Repository overview, build, and execution instructions |
 
-### 1. Clone the Repository
-Download the repository to your local machine:
-```
+---
+
+### Architecture
+
+The system follows a **manager–worker model**:
+
+- **Process P₀ (Manager):**
+  - Initializes and owns the full vector
+  - Distributes vector segments to all processes (including itself)
+  - Coordinates global calculations and gathers results
+
+- **Worker Processes (P₁ … Pₚ₋₁):**
+  - Perform computations on their assigned sub-vectors
+  - Participate in collective communication operations
+
+All calculations are executed **locally first** and then combined using **MPI collective routines**.
+
+---
+
+## Features & Calculations
+
+The program performs the following operations on the distributed vector **X**:
+
+### Question A - Comparison with Average
+- Computes the **mean value** of the vector
+- Counts:
+  - Elements **greater than** the average
+  - Elements **less than** the average
+
+---
+
+### Question B - Dispersion (Variance)
+
+The dispersion (variance) is calculated using:
+
+$$
+\text{var} = \frac{\sum_{i=0}^{n-1} (X_i - m)^2}{n}
+$$
+
+where:
+
+$$
+m 
+$$ 
+
+is the mean value of the vector
+
+---
+
+### Question C - Percentage Relationship Vector
+
+Computes a normalized percentage vector 
+
+$$ 
+D_i 
+$$
+
+:
+
+$$
+D_i = \frac{X_i - X_{min}}{X_{max} - X_{min}} \times 100
+$$
+
+This expresses each element’s relative position between the minimum and maximum values.
+
+---
+
+### Question D - Maximum Value and Index
+- Identifies the **maximum value** in the vector
+- Determines its **global index**
+
+---
+
+### Question E - Prefix Sum (Scan)
+- Computes the **prefix sum vector** of **X**
+- Each element contains the sum of all previous elements up to that position
+
+---
+
+## Repository Setup
+
+```bash
 git clone https://github.com/Introduction-to-Parallel-Computing/Collective-Communication.git
+cd Collective-Communication/src
 ```
-### 2. Compile the Source Code
-Compile the MPI program using the GCC compiler:
-```
+
+---
+
+## Technical Implementation
+
+- **Programming Language:** C  
+- **Parallel Environment:** MPI  
+
+### Key MPI Routines Used
+
+- `MPI_Init`
+- `MPI_Comm_rank`
+- `MPI_Comm_size`
+- `MPI_Bcast`
+- `MPI_Scatter`
+- `MPI_Gather`
+- `MPI_Reduce`
+- `MPI_Scan`
+- `MPI_Finalize`
+
+### Communication Model
+
+- **Primary:** Collective communication  
+- **Secondary:** Point-to-point blocking communication (used specifically for the prefix sum logic)
+
+---
+
+## Usage
+
+### Compilation
+
+Compile the source code using the MPI compiler wrapper:
+
+```bash
 mpicc -o collective_communication collective_communication.c
 ```
-### 3. Run the Program
-Run the MPI program using the `mpirun` or `mpiexec` command, specifying the number of processes:
+
+### Execution
+Run the program with mpirun, specifying the number of processes:
+```bash
+mpirun -np 4 ./collective_communication
 ```
-mpirun -np <number_of_processors> ./collective_communication
-```
+Important:
 
-![Alt text](https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Flag_of_Greece.svg/255px-Flag_of_Greece.svg.png)
+The vector size N must satisfy:
 
-# MPI Πρόγραμμα Ανάλυσης Διανύσματος με Συλλογική Επικοινωνία
+$$
+𝑁
+ 
+m
+o
+d
+ 
+𝑝
+=
+0
+$$
 
-Για την ζητούμενη Άσκηση, κάντε κλικ στον σύνδεσμο:
-[Άσκηση](Assignment/)
+(i.e., N must be an integer multiple of the number of processes)
 
-Για τον Πηγαίο Κώδικα, κάντε κλικ στον σύνδεσμο:
-[Κώδικας](Code/)
+---
 
-Για την Αναλυτική Τεκμηρίωση, κάντε κλικ στον σύνδεσμο:
-[Τεκμηρίωση](Documentation/)
+## Constraints & Limitations
+### Data Distribution Constraint:
+The current implementation does not support uneven vector sizes across processes.
 
-## Επισκόπηση
+### Scalability Limitation:
+Handling cases where 
 
-Αυτό το έργο υλοποιεί ένα πρόγραμμα MPI (Message Passing Interface) σε γλώσσα C για την ανάλυση ενός διανύσματος \(X\) (μήκους \(n\)). Το πρόγραμμα υπολογίζει διάφορες στατιστικές σχετικά με το διάνυσμα σε ένα παράλληλο περιβάλλον με \(p\) επεξεργαστές, περιλαμβάνοντας τον μέσο, τον ελάχιστο και τον μέγιστο αριθμό, και εξάγει επιπλέον ιδιότητες όπως διασπορά, ποσοστιαίες σχέσεις και πρόθετα αθροίσματα.
+$$
+𝑁
+<
+𝑝
+$$
 
-## Στόχοι
+is not supported, as some processes would remain idle.
 
-Το πρόγραμμα εκπληρώνει τις εξής εργασίες:
+---
 
-1. **Μέτρηση Στοιχείων Σχετικά με τον Μέσο**: Να προσδιορίσει πόσα στοιχεία του διανύσματος \(X\) είναι μικρότερα και πόσα μεγαλύτερα από τον μέσο \(m\).
-2. **Υπολογισμός Διασποράς**: Να υπολογίσει την διακύμανση των στοιχείων του διανύσματος \(X\).
-3. **Ποσοστό Διανύσματος**: Να δημιουργήσει ένα νέο διάνυσμα \(D\) όπου κάθε στοιχείο \(y_i\) αντιπροσωπεύει τη ποσοστιαία σχέση του αντίστοιχου στοιχείου \(x_i\) του διανύσματος \(X\) σχετικά με την διαφορά μεταξύ των μέγιστων και ελάχιστων τιμών.
-4. **Μέγιστη Τιμή στο Διάνυσμα \(D\)**: Να προσδιορίσει την μεγαλύτερη τιμή στο διάνυσμα \(D\), μαζί με το αντίστοιχο στοιχείο \(x_i\) στο διάνυσμα \(X\) και τον δείκτη του στοιχείου.
-5. **Πρόθετα Αθροίσματα**: Να υπολογίσει τα πρόθετα αθροίσματα των στοιχείων του διανύσματος \(X\).
+## Conclusion
+This project demonstrates effective use of MPI collective communication for distributed numerical processing. It highlights practical applications of MPI_Bcast, MPI_Scatter, MPI_Reduce, and MPI_Scan, offering a strong foundation for understanding data-parallel computation and process coordination in high-performance computing environments.
 
-## Πληροφορίες Μαθήματος
+---
 
-- **Μάθημα**: [Εισαγωγή στον Παράλληλο Υπολογισμό](https://ice.uniwa.gr/education/undergraduate/courses/introduction-to-parallel-computing/)
-- **Εξάμηνο**: 5
-- **Πρόγραμμα Σπουδών**: [ΠΑΔA](https://www.uniwa.gr/)
-- **Τμήμα**: [Πληροφορική και Μηχανική Υπολογιστών](https://ice.uniwa.gr/)
-- **Διδάσκων**: [Ιορδανάκης Μιχαήλ](https://ice.uniwa.gr/academic_sc_ho/)
-- **Ακαδημαϊκή Χρονιά**: 2022-2023
+## Open the Documentation
+1. Navigate to the `docs/` directory
+2. Open the report corresponding to your preferred language:
+    - English: `Collective-Communication.pdf`
+    - Greek: `Συλλογική-Επικοινωνία.pdf`
 
-## Πληροφορίες Φοιτητή
 
-- **Όνομα**: Αθανασίου Βασίλειος Ευάγγελος
-- **ΑΜ**: 19390005
-- **Κατάσταση**: Προπτυχιακός
 
-## Δομή Προγράμματος
 
-### Κύριο Πρόγραμμα MPI
-
-- **Αρχείο**: `collective_communication.c`
-- **Λειτουργικότητα**: 
-  - Διαβάζει το μέγεθος του διανύσματος \(N\) και τα στοιχεία του από τον χρήστη.
-  - Κατανέμει το φόρτο εργασίας μεταξύ \(p\) επεξεργαστών για παράλληλους υπολογισμούς.
-  - Συγκεντρώνει τα αποτελέσματα από όλους τους επεξεργαστές και εκτυπώνει την ανάλυση, συμπεριλαμβανομένου του πρόθετου αθροίσματος.
-
-### Μενού και Επανάληψη
-
-- Το πρόγραμμα παρέχει ένα φιλικό προς τον χρήστη μενού με επιλογές για:
-  1. Συνέχιση της ανάλυσης ενός άλλου διανύσματος.
-  2. Έξοδο από το πρόγραμμα.
-- Το μενού εμφανίζεται επαναληπτικά μέχρι ο χρήστης να επιλέξει να εξοφλήσει.
-
-## Απαιτήσεις
-
-- **Λειτουργικό Σύστημα**: Linux-based OS ή οποιοδήποτε Unix-like σύστημα που υποστηρίζει MPI.
-- **Μεταγλωττιστής**: GCC (GNU Compiler Collection).
-- **Βιβλιοθήκες**: Βιβλιοθήκη MPI (`mpi.h`).
-
-## Εγκατάσταση και Χρήση
-
-### 1. Κλωνοποιήστε το αποθετήριο
-Κατεβάστε το αποθετήριο στον τοπικό σας υπολογιστή:
-```
-git clone https://github.com/Introduction-to-Parallel-Computing/Collective-Communication.git
-```
-### 2. Μεταγλωττίστε τον Πηγαίο Κώδικα
-Συμπιέστε το πρόγραμμα MPI χρησιμοποιώντας τον μεταγλωττιστή GCC:
-```
-mpicc -o collective_communication collective_communication.c
-```
-### 3. Εκτέλεση του Προγράμματος
-Εκτελέστε το πρόγραμμα MPI χρησιμοποιώντας την εντολή `mpirun` ή `mpiexec`, καθορίζοντας τον αριθμό των διεργασιών:
-```
-mpirun -np <number_of_processors> ./collective_communication
-```
