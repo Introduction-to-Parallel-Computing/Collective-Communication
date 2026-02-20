@@ -79,111 +79,98 @@
 
 ---
 
-# README
+# INSTALL
 
 ## Collective Communication
 
-The primary objective of this exercise is to manage and process a vector **X** of size **N** across **p processes** using MPI and collective communication.
+This guide explains how to set up, build, and run the project on your local machine.
 
 ---
 
-## Table of Contents
+## 1. Repository Setup
 
-| Section | Folder                               | Description                                                          |
-| ------: | ------------------------------------ | -------------------------------------------------------------------- |
-|       1 | `assign/`                            | Assignment material for the Collective Communication laboratory      |
-|     1.1 | `assign/PAR-LAB-EXER-II-2022-23.pdf` | Laboratory exercise description in English                           |
-|     1.2 | `assign/ΠΑΡ-ΕΡΓ-ΑΣΚ-ΙΙ-2022-23.pdf`  | Περιγραφή εργαστηριακής άσκησης (Greek)                              |
-|       2 | `docs/`                              | Documentation and theoretical background on collective communication |
-|     2.1 | `docs/Collective-Communication.pdf`  | Theory and mechanisms of collective communication (EN)               |
-|     2.2 | `docs/Συλλογική-Επικοινωνία.pdf`     | Θεωρία Συλλογικής Επικοινωνίας (EL)                                  |
-|       3 | `src/`                               | Source code implementing collective communication operations         |
-|     3.1 | `src/collective_communication.c`     | C implementation of MPI collective communication primitives          |
-|       4 | `README.md`                          | Project documentation                                                |
-|       5 | `INSTALL.md`                         | Usage instructions                                                   |
+```bash
+git clone https://github.com/Introduction-to-Parallel-Computing/Collective-Communication.git
+cd Collective-Communication/src
+```
 
 ---
 
-## 1. Architecture
+## 2. Technical Implementation
 
-The system follows a **manager–worker model**:
+- **Programming Language:** C
+- **Parallel Environment:** MPI
 
-- **Process P₀ (Manager):**
-  - Initializes and owns the full vector
-  - Distributes vector segments to all processes (including itself)
-  - Coordinates global calculations and gathers results
+### 2.1 Key MPI Routines Used
 
-- **Worker Processes (P₁ … Pₚ₋₁):**
-  - Perform computations on their assigned sub-vectors
-  - Participate in collective communication operations
+- `MPI_Init`
+- `MPI_Comm_rank`
+- `MPI_Comm_size`
+- `MPI_Bcast`
+- `MPI_Scatter`
+- `MPI_Gather`
+- `MPI_Reduce`
+- `MPI_Scan`
+- `MPI_Finalize`
 
-All calculations are executed **locally first** and then combined using **MPI collective routines**.
+### 2.2 Communication Model
 
----
-
-## 2. Features & Calculations
-
-The program performs the following operations on the distributed vector **X**:
-
-### Question A - Comparison with Average
-
-- Computes the **mean value** of the vector
-- Counts:
-  - Elements **greater than** the average
-  - Elements **less than** the average
+- **Primary:** Collective communication
+- **Secondary:** Point-to-point blocking communication (used specifically for the prefix sum logic)
 
 ---
 
-## 3. Question B - Dispersion (Variance)
+## 3. Usage
 
-The dispersion (variance) is calculated using:
+### 3.1 Compilation
+
+Compile the source code using the MPI compiler wrapper:
+
+```bash
+mpicc -o collective_communication collective_communication.c
+```
+
+### 3.2 Execution
+
+Run the program with mpirun, specifying the number of processes:
+
+```bash
+mpirun -np 4 ./collective_communication
+```
+
+Important:
+
+The vector size N must satisfy:
 
 $$
-\text{var} = \frac{\sum_{i=0}^{n-1} (X_i - m)^2}{n}
+N mod p = 0
 $$
 
-where:
-
-$$
-m
-$$
-
-is the mean value of the vector
+(i.e., N must be an integer multiple of the number of processes)
 
 ---
 
-## 4. Question C - Percentage Relationship Vector
+## 4. Constraints & Limitations
 
-Computes a normalized percentage vector
+### 4.1 Data Distribution Constraint:
+
+The current implementation does not support uneven vector sizes across processes.
+
+### 4.2 Scalability Limitation:
+
+Handling cases where
 
 $$
-D_i
+N < p
 $$
 
-:
-
-$$
-D_i = \frac{X_i - X_{min}}{X_{max} - X_{min}} \times 100
-$$
-
-This expresses each element’s relative position between the minimum and maximum values.
+is not supported, as some processes would remain idle.
 
 ---
 
-## 5. Question D - Maximum Value and Index
+## 5. Open the Documentation
 
-- Identifies the **maximum value** in the vector
-- Determines its **global index**
-
----
-
-## 6. Question E - Prefix Sum (Scan)
-
-- Computes the **prefix sum vector** of **X**
-- Each element contains the sum of all previous elements up to that position
-
----
-
-## 7. Conclusion
-
-This project demonstrates effective use of MPI collective communication for distributed numerical processing. It highlights practical applications of MPI_Bcast, MPI_Scatter, MPI_Reduce, and MPI_Scan, offering a strong foundation for understanding data-parallel computation and process coordination in high-performance computing environments.
+1. Navigate to the `docs/` directory
+2. Open the report corresponding to your preferred language:
+   - English: `Collective-Communication.pdf`
+   - Greek: `Συλλογική-Επικοινωνία.pdf`
